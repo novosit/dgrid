@@ -1,16 +1,17 @@
 define([
+	'ninejs/ui/utils/setClass',
+	'ninejs/ui/utils/append',
 	"dojo/_base/kernel",
 	"dojo/_base/lang",
-	"dojo/_base/array",
+	"ninejs/core/array",
 	"dojo/_base/Deferred",
-	"dojo/on",
+	"ninejs/core/on",
 	"dojo/aspect",
 	"dojo/has",
 	"dojo/query",
 	"./Grid",
-	"put-selector/put",
 	"dojo/_base/sniff"
-], function(kernel, lang, arrayUtil, Deferred, on, aspect, has, query, Grid, put){
+], function(setClass, append, kernel, lang, arrayUtil, Deferred, on, aspect, has, query, Grid){
 
 function updateInputValue(input, value){
 	// common code for updating value of a standard input
@@ -193,13 +194,25 @@ function createEditor(column){
 			grid.on("change", function(evt){ handleChange(evt); });
 			// also register a focus listener
 		}
-		
-		putstr = editor == "textarea" ? "textarea" :
-			"input[type=" + editor + "]";
-		cmp = node = put(putstr + ".dgrid-input", lang.mixin({
+
+		if (editor == "textarea") {
+			node = append.create("textarea");
+		}
+		else {
+			node = append.create("input");
+			node.type = editor;
+		}
+		cmp = node;
+		var o = {
 			name: column.field,
 			tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex
-		}, args));
+		};
+		o = lang.mixin(o, args);
+		for (var p in o) {
+			if (o.hasOwnProperty(p)) {
+				node[p] = o[p];
+			}
+		}
 		
 		if(has("ie") < 9 || (has("ie") && has("quirks"))){
 			// IE<9 / quirks doesn't fire change events for all the right things,
@@ -271,8 +284,8 @@ function createSharedEditor(column, originalRenderCell){
 		if(cell.row){
 			// If the row is still present (i.e. we didn't blur due to removal),
 			// clear out the rest of the cell's contents, then re-render with new value.
-			put(cell.element, "!dgrid-cell-editing");
-			while(i--){ put(parentNode.firstChild, "!"); }
+			setClass(cell.element, "!dgrid-cell-editing");
+			while(i--){ parentNode.removeChild(parentNode.firstChild); }
 			Grid.appendIfNode(parentNode, column.renderCell(
 				column.grid.row(parentNode).data, grid._activeValue, parentNode,
 				grid._activeOptions ? lang.delegate(options, grid._activeOptions) : options));
@@ -319,8 +332,8 @@ function showEditor(cmp, column, cellElement, value){
 	if(!isWidget){ updateInputValue(cmp, value); }
 	
 	cellElement.innerHTML = "";
-	put(cellElement, ".dgrid-cell-editing");
-	put(cellElement, cmp.domNode || cmp);
+	setClass(cellElement, "dgrid-cell-editing");
+	append(cellElement, cmp.domNode || cmp);
 	
 	if(isWidget){
 		// For widgets, ensure startup is called before setting value,

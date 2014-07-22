@@ -1,5 +1,7 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "dojo/aspect", "put-selector/put"],
-function(kernel, declare, lang, Deferred, listen, aspect, put){
+define(['ninejs/ui/utils/setClass',
+		'ninejs/ui/utils/append',
+		"dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "ninejs/core/on", "dojo/aspect"],
+function(setClass, append, kernel, declare, lang, Deferred, listen, aspect){
 	// This module isolates the base logic required by store-aware list/grid
 	// components, e.g. OnDemandList/Grid and the Pagination extension.
 	
@@ -338,7 +340,7 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 			// no longer being present as a sibling.
 			var row = this.inherited(arguments);
 			if(this.noDataNode){
-				put(this.noDataNode, "!");
+				this.noDataNode.parentNode.removeChild(this.noDataNode);
 				delete this.noDataNode;
 			}
 			return row;
@@ -350,7 +352,7 @@ function(kernel, declare, lang, Deferred, listen, aspect, put){
 					(this.up(row).element === rowElement) &&
 					(this.down(row).element === rowElement)){
 				// ...we are empty, so show the no data message.
-				this.noDataNode = put(this.contentNode, "div.dgrid-no-data");
+				this.noDataNode = setClass(append(this.contentNode, "div"), "dgrid-no-data");
 				this.noDataNode.innerHTML = this.noDataMessage;
 			}
 			return this.inherited(arguments);

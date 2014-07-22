@@ -1,5 +1,6 @@
-define(["dojo/_base/kernel", "dojo/_base/array", "dojo/on", "dojo/aspect", "dojo/_base/sniff", "put-selector/put"],
-function(kernel, arrayUtil, on, aspect, has, put){
+define(['ninejs/ui/utils/setClass',
+		"dojo/_base/kernel", "ninejs/core/array", "dojo/aspect", "dojo/_base/sniff", "ninejs/core/on"],
+function(setClass, kernel, arrayUtil, aspect, has){
 	return function(column, type){
 		
 		var listeners = [],
@@ -96,7 +97,7 @@ function(kernel, arrayUtil, on, aspect, has, put){
 					}
 				}else{
 					// No row resolved; must be the select-all checkbox.
-					put(this, (grid.allSelected ? "!" : ".") + "dgrid-select-all");
+					setClass(this, (grid.allSelected ? "!" : "") + "dgrid-select-all");
 					grid[grid.allSelected ? "clearSelection" : "selectAll"]();
 				}
 				grid._selectionTriggerEvent = null;

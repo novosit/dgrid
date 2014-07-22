@@ -1,5 +1,7 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/on", "dojo/aspect", "dojo/query", "dojo/has", "./util/misc", "put-selector/put", "xstyle/has-class", "./Grid", "dojo/_base/sniff", "xstyle/css!./css/columnset.css"],
-function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, put, hasClass, Grid){
+define(['ninejs/ui/utils/setClass',
+		'ninejs/ui/utils/append',
+		"dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "ninejs/core/on", "dojo/aspect", "dojo/query", "dojo/has", "./util/misc", "xstyle/has-class", "./Grid", "dojo/_base/sniff", "xstyle/css!./css/columnset.css"],
+function(setClass, append, kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, hasClass, Grid){
 	has.add("event-mousewheel", function(global, document, element){
 		return typeof element.onmousewheel !== "undefined";
 	});
@@ -121,12 +123,14 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 		},
 		columnSets: [],
 		createRowCells: function(tag, each, subRows, object){
-			var row = put("table.dgrid-row-table");
-			var tr = put(row, "tbody tr");
+			var row = setClass(append.create('table'), "dgrid-row-table");
+			var tr = append(append(row, "tbody"), "tr");
 			for(var i = 0, l = this.columnSets.length; i < l; i++){
 				// iterate through the columnSets
-				var cell = put(tr, tag + ".dgrid-column-set-cell.dgrid-column-set-" + i +
-					" div.dgrid-column-set[" + colsetidAttr + "=" + i + "]");
+				var cell = setClass(append(
+						setClass(append(tr, tag), "dgrid-column-set-cell", "dgrid-column-set-" + i),
+						"div"), "dgrid-column-set");
+				cell.setAttribute(colsetidAttr, i);
 				var subset = getColumnSetSubRows(subRows || this.subRows , i) || this.columnSets[i];
 				cell.appendChild(this.inherited(arguments, [tag, each, subset, object]));
 			}
@@ -164,7 +168,7 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 			if (scrollers) {
 				// this isn't the first time; destroy existing scroller nodes first
 				for(i in scrollers){
-					put(scrollers[i], "!");
+					scrollers[i].parentNode.removeChild(scrollers[i]);
 				}
 			} else {
 				// first-time-only operations: hook up event/aspected handlers
@@ -258,9 +262,9 @@ function(kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, 
 		_putScroller: function (columnSet, i){
 			// function called for each columnSet
 			var scroller = this._columnSetScrollers[i] =
-				put(this.domNode, "div.dgrid-column-set-scroller.dgrid-column-set-scroller-" + i +
-					"[" + colsetidAttr + "=" + i +"]");
-			this._columnSetScrollerContents[i] = put(scroller, "div.dgrid-column-set-scroller-content");
+				setClass(append(this.domNode, "div"), "dgrid-column-set-scroller", "dgrid-column-set-scroller-" + i);
+			scroller.setAttribute(colsetidAttr, i);
+			this._columnSetScrollerContents[i] = setClass(append(scroller, "div"), "dgrid-column-set-scroller-content");
 			listen(scroller, "scroll", lang.hitch(this, '_onColumnSetScroll'));
 		},
 

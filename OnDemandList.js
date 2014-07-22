@@ -1,5 +1,7 @@
-define(["./List", "./_StoreMixin", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/dom", "dojo/on", "./util/misc", "put-selector/put"],
-function(List, _StoreMixin, declare, lang, Deferred, dom, listen, miscUtil, put){
+define(['ninejs/ui/utils/setClass',
+		'ninejs/ui/utils/append',
+		"./List", "./_StoreMixin", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "dojo/dom", "ninejs/core/on", "./util/misc"],
+function(setClass, append, List, _StoreMixin, declare, lang, Deferred, dom, listen, miscUtil){
 
 return declare([List, _StoreMixin], {
 	// summary:
@@ -88,17 +90,17 @@ return declare([List, _StoreMixin], {
 		
 		if(!preloadNode){
 			// Initial query; set up top and bottom preload nodes
+			var preloadN = setClass(append(this.contentNode, "div"), "dgrid-preload");
+			preloadN.rowIndex = 0;
 			var topPreload = {
-				node: put(this.contentNode, "div.dgrid-preload", {
-					rowIndex: 0
-				}),
+				node: preloadN,
 				count: 0,
 				query: query,
 				next: preload,
 				options: options
 			};
 			topPreload.node.style.height = "0";
-			preload.node = preloadNode = put(this.contentNode, "div.dgrid-preload");
+			preload.node = preloadNode = setClass(append(this.contentNode, "div"), "dgrid-preload");
 			preload.previous = topPreload;
 		}
 		// this preload node is used to represent the area of the grid that hasn't been
@@ -124,14 +126,14 @@ return declare([List, _StoreMixin], {
 			this.preload = preload;
 		}
 		
-		var loadingNode = put(preloadNode, "-div.dgrid-loading"),
-			innerNode = put(loadingNode, "div.dgrid-below");
+		var loadingNode = preloadNode.parentNode.insertBefore(setClass(append.create("div"), "dgrid-loading"), preloadNode),
+			innerNode = setClass(append(loadingNode, "div"), "dgrid-below");
 		innerNode.innerHTML = this.loadingMessage;
 
 		function errback(err) {
 			// Used as errback for when calls;
 			// remove the loadingNode and re-throw if an error was passed
-			put(loadingNode, "!");
+			append.remove(loadingNode);
 			
 			if(err){
 				if(self._refreshDeferred){
@@ -166,17 +168,17 @@ return declare([List, _StoreMixin], {
 					parentNode = preloadNode.parentNode,
 					noDataNode = self.noDataNode;
 				
-				put(loadingNode, "!");
+				append.remove(loadingNode);
 				if(!("queryLevel" in options)){
 					self._total = total;
 				}
 				// now we need to adjust the height and total count based on the first result set
 				if(total === 0){
 					if(noDataNode){
-						put(noDataNode, "!");
+						append.remove(noDataNode);
 						delete self.noDataNode;
 					}
-					self.noDataNode = noDataNode = put("div.dgrid-no-data");
+					self.noDataNode = noDataNode = setClass(append.create("div"), "dgrid-no-data");
 					parentNode.insertBefore(noDataNode, self._getFirstRowSibling(parentNode));
 					noDataNode.innerHTML = self.noDataMessage;
 				}
@@ -386,10 +388,14 @@ return declare([List, _StoreMixin], {
 					preloadNode.style.height = (preloadNode.offsetHeight + reclaimedHeight) + "px";
 				}
 				// we remove the elements after expanding the preload node so that the contraction doesn't alter the scroll position
-				var trashBin = put("div", toDelete);
+				var trashBin = append.create("div");
+				array.forEach(toDelete, function (item) {
+					append.remove(item);
+					append(trashBin, item);
+				});
 				setTimeout(function(){
 					// we can defer the destruction until later
-					put(trashBin, "!");
+					append.remove(trashBin);
 				},1);
 			}
 		}
@@ -513,8 +519,11 @@ return declare([List, _StoreMixin], {
 				}
 				
 				// create a loading node as a placeholder while the data is loaded
-				var loadingNode = put(beforeNode, "-div.dgrid-loading[style=height:" + count * grid.rowHeight + "px]"),
-					innerNode = put(loadingNode, "div.dgrid-" + (below ? "below" : "above"));
+				var loadingNode = append.create("div"),
+					innerNode;
+					beforeNode.parentNode.insertBefore(setClass(loadingNode, "dgrid-loading"), beforeNode);
+				loadingNode.style = "height:" + count * grid.rowHeight + "px";
+				innerNode = setClass(append(loadingNode, "div"), "dgrid-" + (below ? "below" : "above"));
 				innerNode.innerHTML = grid.loadingMessage;
 				loadingNode.count = count;
 				
@@ -526,7 +535,7 @@ return declare([List, _StoreMixin], {
 				
 				if(trackedResults === undefined){
 					// Sync query failed
-					put(loadingNode, "!");
+					append.remove(loadingNode);
 					return;
 				}
 
@@ -538,7 +547,7 @@ return declare([List, _StoreMixin], {
 						
 						// can remove the loading node now
 						beforeNode = loadingNode.nextSibling;
-						put(loadingNode, "!");
+						append.remove(loadingNode);
 						if(keepScrollTo && beforeNode && beforeNode.offsetWidth){ // beforeNode may have been removed if the query results loading node was a removed as a distant node before rendering 
 							// if the preload area above the nodes is approximated based on average
 							// row height, we may need to adjust the scroll once they are filled in
@@ -581,7 +590,7 @@ return declare([List, _StoreMixin], {
 						grid._processScroll();
 						return rows;
 					}, function (e) {
-						put(loadingNode, "!");
+						append.remove(loadingNode);
 						throw e;
 					});
 				}).call(this, loadingNode, below, keepScrollTo, results);

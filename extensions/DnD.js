@@ -1,21 +1,21 @@
 define([
+	'ninejs/ui/utils/setClass',
 	"dojo/_base/declare",
 	"dojo/_base/lang",
-	"dojo/_base/array",
+	"ninejs/core/array",
 	"dojo/_base/Deferred",
 	"dojo/aspect",
-	"dojo/on",
+	"ninejs/core/on",
 	"dojo/topic",
 	"dojo/has",
 	"dojo/dnd/Source",
 	"dojo/dnd/Manager",
 	"dojo/_base/NodeList",
-	"put-selector/put",
 	"../Selection",
 	"dojo/has!touch?../util/touch",
 	"dojo/has!touch?./_DnD-touch-autoscroll",
 	"xstyle/css!dojo/resources/dnd.css"
-], function(declare, lang, arrayUtil, Deferred, aspect, on, topic, has, DnDSource, DnDManager, NodeList, put, Selection, touchUtil){
+], function(setClass, declare, lang, arrayUtil, Deferred, aspect, on, topic, has, DnDSource, DnDManager, NodeList, Selection, touchUtil){
 	// Requirements
 	// * requires a store (sounds obvious, but not all Lists/Grids have stores...)
 	// * must support options.before in put calls
@@ -247,7 +247,7 @@ define([
 				delete selectedNodes[row.id];
 				// Re-sync dojo/dnd UI classes based on deselection
 				// (unfortunately there is no good programmatic hook for this)
-				put(row.element, '!dojoDndItemSelected!dojoDndItemAnchor');
+				setClass(row.element, '!dojoDndItemSelected!dojoDndItemAnchor');
 			}
 			
 			this.on("dgrid-select", function(event){
@@ -270,7 +270,7 @@ define([
 				type = typeof this.getObjectDndType == "function" ?
 					this.getObjectDndType(object) : [this.dndSourceType];
 			
-			put(row, ".dojoDndItem");
+			setClass(row, "dojoDndItem");
 			this.dndSource.setItem(row.id, {
 				data: object,
 				type: type instanceof Array ? type : [type]

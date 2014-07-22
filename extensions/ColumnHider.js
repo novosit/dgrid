@@ -1,5 +1,8 @@
-define(["dojo/_base/declare", "dojo/has", "dojo/on", "../util/misc", "put-selector/put", "dojo/i18n!./nls/columnHider", "xstyle/css!../css/extensions/ColumnHider.css"],
-function(declare, has, listen, miscUtil, put, i18n){
+define(['ninejs/ui/utils/setText',
+		'ninejs/ui/utils/setClass',
+		'ninejs/ui/utils/append',
+		"dojo/_base/declare", "dojo/has", "ninejs/core/on", "../util/misc", "dojo/i18n!./nls/columnHider", "xstyle/css!../css/extensions/ColumnHider.css"],
+function(setText, setClass, append, declare, has, listen, miscUtil, i18n){
 /*
  *	Column Hider plugin for dgrid
  *	Originally contributed by TRT 2011-09-28
@@ -100,20 +103,21 @@ function(declare, has, listen, miscUtil, put, i18n){
 			if(col.unhidable){ return; }
 			
 			// Create the checkbox and label for each column selector.
-			div = put("div.dgrid-hider-menu-row");
+			div = setClass(append.create("div"), "dgrid-hider-menu-row");
 			checkId = this.domNode.id + "-hider-menu-check-" + replacedId;
 			
 			// put-selector can't handle invalid selector characters, and the
 			// ID could have some, so add it directly
 			checkbox = this._columnHiderCheckboxes[id] =
-				put(div, "input.dgrid-hider-menu-check.hider-menu-check-" + replacedId + "[type=checkbox]");
+				setClass(append(div, "input"), "dgrid-hider-menu-check", "hider-menu-check-" + replacedId);
+			checkbox.type = "checkbox";
 			checkbox.id = checkId;
 			
-			label = put(div, "label.dgrid-hider-menu-label.hider-menu-label-" + replacedId +
-				"[" + forAttr + "=" + checkId + "]",
-				col.label || col.field || "");
+			label = setClass(append(div, "label"), "dgrid-hider-menu-label", "hider-menu-label-" + replacedId);
+			label[forAttr] = checkId;
+			setText(label, col.label || col.field || "");
 			
-			put(this.hiderMenuNode, div);
+			append(this.hiderMenuNode, div);
 			
 			if(!col.hidden){
 				// Hidden state is false; checkbox should be initially checked.
@@ -138,7 +142,8 @@ function(declare, has, listen, miscUtil, put, i18n){
 				// Assume that if this plugin is used, then columns are hidable.
 				// Create the toggle node.
 				hiderToggleNode = this.hiderToggleNode =
-					put(this.domNode, "button.ui-icon.dgrid-hider-toggle[type=button]");
+					setClass(append(this.domNode, "button"), "ui-icon", "dgrid-hider-toggle");
+				hiderToggleNode.type = "button";
 				
 				this._listeners.push(listen(hiderToggleNode, "click", function(e){
 					grid._toggleColumnHiderMenu(e);
@@ -146,8 +151,9 @@ function(declare, has, listen, miscUtil, put, i18n){
 	
 				// Create the column list, with checkboxes.
 				hiderMenuNode = this.hiderMenuNode =
-					put("div.dgrid-hider-menu[role=dialog][aria-label=" +
-						this.i18nColumnHider.popupLabel + "]");
+					setClass(append.create("div"), "dgrid-hider-menu");
+				hiderMenuNode.setAttribute("role", "dialog");
+				hiderMenuNode.setAttribute("aria-label", this.i18nColumnHider.popupLabel);
 				hiderMenuNode.id = this.id + "-hider-menu";
 
 				this._listeners.push(listen(hiderMenuNode, "keyup", function (e) {
@@ -160,7 +166,7 @@ function(declare, has, listen, miscUtil, put, i18n){
 				
 				// Make sure our menu is initially hidden, then attach to the document.
 				hiderMenuNode.style.display = "none";
-				put(this.domNode, hiderMenuNode);
+				append(this.domNode, hiderMenuNode);
 				
 				// Hook up delegated listener for modifications to checkboxes.
 				this._listeners.push(listen(hiderMenuNode,

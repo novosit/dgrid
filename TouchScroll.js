@@ -1,8 +1,10 @@
 // FIXME:
 // * fully make use of transitions in glide routines
 
-define(["dojo/_base/declare", "dojo/on", "./util/touch", "./util/has-css3", "put-selector/put", "xstyle/css!./css/TouchScroll.css"],
-function(declare, on, touchUtil, has, put){
+define(['ninejs/ui/utils/setClass',
+		'ninejs/ui/utils/append',
+		"dojo/_base/declare", "ninejs/core/on", "./util/touch", "./util/has-css3", "xstyle/css!./css/TouchScroll.css"],
+function(setClass, append, declare, on, touchUtil, has){
 	var
 		calcTimerRes = 50, // ms between drag velocity measurements
 		glideTimerRes = 30, // ms between glide animation ticks
@@ -60,33 +62,33 @@ function(declare, on, touchUtil, has, put){
 		
 		if(scrollWidth > parentWidth){
 			if(!widget._scrollbarXNode){
-				scrollbarNode = put(parentNode, "div.touchscroll-x");
+				scrollbarNode = setClass(append(parentNode, "div"), "touchscroll-x");
 			}
 			scrollbarNode = widget._scrollbarXNode =
-				widget._scrollbarXNode || put(scrollbarNode, "div.touchscroll-bar");
+				widget._scrollbarXNode || setClass(append(scrollbarNode, "div"), "touchscroll-bar");
 			scrollbarNode.style.width =
 				adjustedParentWidth * adjustedParentWidth / scrollWidth + "px";
 			scrollbarNode.style.left = node.offsetLeft + "px";
-			put(parentNode, ".touchscroll-scrollable-x");
+			setClass(parentNode, "touchscroll-scrollable-x");
 			curr.scrollableX = true;
 		}else{
-			put(parentNode, "!touchscroll-scrollable-x");
+			setClass(parentNode, "!touchscroll-scrollable-x");
 		}
 		if(scrollHeight > parentHeight){
 			if(!widget._scrollbarYNode){
-				scrollbarNode = put(parentNode, "div.touchscroll-y");
+				scrollbarNode = setClass(append(parentNode, "div"), "touchscroll-y");
 			}
 			scrollbarNode = widget._scrollbarYNode =
-				widget._scrollbarYNode || put(scrollbarNode, "div.touchscroll-bar");
+				widget._scrollbarYNode || setClass(append(scrollbarNode, "div"), "touchscroll-bar");
 			scrollbarNode.style.height =
 				adjustedParentHeight * adjustedParentHeight / scrollHeight + "px";
 			scrollbarNode.style.top = node.offsetTop + "px";
-			put(parentNode, ".touchscroll-scrollable-y");
+			setClass(parentNode, "touchscroll-scrollable-y");
 			curr.scrollableY = true;
 		}else{
-			put(parentNode, "!touchscroll-scrollable-y");
+			setClass(parentNode, "!touchscroll-scrollable-y");
 		}
-		put(parentNode, "!touchscroll-fadeout");
+		setClass(parentNode, "!touchscroll-fadeout");
 	}
 	
 	function scroll(widget, options){
@@ -178,7 +180,7 @@ function(declare, on, touchUtil, has, put){
 		
 		// Fade out scrollbars unless indicated otherwise (e.g. re-touch).
 		if(!options || !options.preserveScrollbars){
-			put(this.node.parentNode, ".touchscroll-fadeout");
+			setClass(this.node.parentNode, "touchscroll-fadeout");
 		}
 		
 		// Remove this method so it can't be called again.
@@ -629,7 +631,7 @@ function(declare, on, touchUtil, has, put){
 			if(curr.resetEffects){ curr.resetEffects(); }
 			else{
 				if(curr.timer){ clearTimeout(curr.timer); }
-				put(curr.node.parentNode, ".touchscroll-fadeout");
+				setClass(curr.node.parentNode, "touchscroll-fadeout");
 			}
 			
 			delete current[this.id];

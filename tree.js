@@ -1,15 +1,16 @@
 define([
+	'ninejs/ui/utils/setClass',
+	'ninejs/ui/utils/append',
 	"dojo/_base/declare",
-	"dojo/_base/array",
+	"ninejs/core/array",
 	"dojo/_base/Deferred",
 	"dojo/query",
-	"dojo/on",
+	"ninejs/core/on",
 	"dojo/aspect",
 	"./util/has-css3",
 	"./Grid",
-	"dojo/has!touch?./util/touch",
-	"put-selector/put"
-], function(declare, arrayUtil, Deferred, querySelector, on, aspect, has, Grid, touchUtil, put){
+	"dojo/has!touch?./util/touch"
+], function(setClass, append, declare, arrayUtil, Deferred, querySelector, on, aspect, has, Grid, touchUtil){
 
 function defaultRenderExpando(level, hasChildren, expanded, object){
 	// summary:
@@ -21,8 +22,13 @@ function defaultRenderExpando(level, hasChildren, expanded, object){
 	if(hasChildren){
 		cls += ".ui-icon.ui-icon-triangle-1-" + (expanded ? "se" : "e");
 	}
-	node = put("div" + cls + "[style=margin-" + dir + ": " +
-		(level * (this.indentWidth || 9)) + "px; float: " + dir + "]");
+	node = append.create("div");
+	arrayUtil.forEach(cls.split("."), function (item) {
+		if (item) {
+			setClass(node, item);
+		}
+	});
+	node.style = "margin-" + dir + ": " + (level * (this.indentWidth || 9)) + "px; float: " + dir;
 	node.innerHTML = "&nbsp;"; // for opera to space things properly
 	return node;
 }
@@ -42,10 +48,10 @@ function ontransitionend(event){
 		// For browsers with CSS transition support, setting the height to
 		// auto or "" will cause an animation to zero height for some
 		// reason, so temporarily set the transition to be zero duration
-		put(this, ".dgrid-tree-resetting");
+		setClass(this, "dgrid-tree-resetting");
 		setTimeout(function(){
 			// Turn off the zero duration transition after we have let it render
-			put(container, "!dgrid-tree-resetting");
+			setClass(container, "!dgrid-tree-resetting");
 		});
 	}
 	// Now set the height to auto
@@ -144,7 +150,7 @@ function tree(column){
 				});
 				// now remove the connected container node
 				if(!justCleanup){
-					put(connected, "!");
+					append.remove(connected);
 				}
 			}
 		}));
@@ -194,8 +200,7 @@ function tree(column){
 				var expanded = expand === undefined ? !this._expanded[row.id] : expand;
 				
 				// update the expando display
-				put(target, ".ui-icon-triangle-1-" + (expanded ? "se" : "e") +
-					"!ui-icon-triangle-1-" + (expanded ? "e" : "se"));
+				setClass(target, "ui-icon-triangle-1-" + (expanded ? "se" : "e"), "!ui-icon-triangle-1-" + (expanded ? "e" : "se"));
 				
 				var preloadNode = target.preloadNode,
 					rowElement = row.element,
@@ -209,8 +214,15 @@ function tree(column){
 				if(!preloadNode){
 					// if the children have not been created, create a container, a preload node and do the 
 					// query for the children
-					container = rowElement.connected = put('div.dgrid-tree-container');//put(rowElement, '+...
-					preloadNode = target.preloadNode = put(rowElement, '+', container, 'div.dgrid-preload');
+					container = rowElement.connected = setClass(append('div'), 'dgrid-tree-container');//put(rowElement, '+...
+					//setting container after rowElement
+					if (rowElement.nextSibling) {
+						rowElement.parentNode.insertBefore(container, rowElement.nextSibling);
+					}
+					else {
+						append(rowElement.parentNode, container);
+					}
+					preloadNode = target.preloadNode = setClass(append(container, 'div'), 'dgrid-preload');
 					var query = function(options){
 						return grid.store.getChildren(row.data, options);
 					};
@@ -264,12 +276,12 @@ function tree(column){
 					else{
 						// if it will be hidden we need to be able to give a full height
 						// without animating it, so it has the right starting point to animate to zero
-						put(container, ".dgrid-tree-resetting");
+						setClass(container, "dgrid-tree-resetting");
 						containerStyle.height = container.scrollHeight + "px";
 					}
 					// Perform a transition for the expand or collapse.
 					setTimeout(function(){
-						put(container, "!dgrid-tree-resetting");
+						setClass(container, "!dgrid-tree-resetting");
 						containerStyle.height =
 							expanded ? (scrollHeight ? scrollHeight + "px" : "auto") : "0px";
 					});
@@ -313,8 +325,8 @@ function tree(column){
 		
 		node = originalRenderCell.call(column, object, value, td, options);
 		if(node && node.nodeType){
-			put(td, expando);
-			put(td, node);
+			append(td, expando);
+			append(td, node);
 		}else{
 			td.insertBefore(expando, td.firstChild);
 		}

@@ -1,5 +1,7 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put", "./List", "./util/misc", "dojo/_base/sniff"],
-function(kernel, declare, listen, has, put, List, miscUtil){
+define(['ninejs/ui/utils/setClass',
+		'ninejs/ui/utils/append',
+		"dojo/_base/kernel", "dojo/_base/declare", "ninejs/core/on", "dojo/has", "./List", "./util/misc", "dojo/_base/sniff"],
+function(setClass, append, kernel, declare, listen, has, List, miscUtil){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
 	
 	function appendIfNode(parent, subNode){
@@ -84,15 +86,15 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 		createRowCells: function(tag, each, subRows, object){
 			// summary:
 			//		Generates the grid for each row (used by renderHeader and and renderRow)
-			var row = put("table.dgrid-row-table[role=presentation]"),
+			var row = setClass(append.create("table"), "dgrid-row-table"),
 				cellNavigation = this.cellNavigation,
 				// IE < 9 needs an explicit tbody; other browsers do not
-				tbody = (has("ie") < 9 || has("quirks")) ? put(row, "tbody") : row,
+				tbody = (has("ie") < 9 || has("quirks")) ? append(row, "tbody") : row,
 				tr,
 				si, sl, i, l, // iterators
 				subRow, column, id, extraClasses, className,
 				cell, innerCell, colSpan, rowSpan; // used inside loops
-			
+			row.setAttribute("role", "presentation");
 			// Allow specification of custom/specific subRows, falling back to
 			// those defined on the instance.
 			subRows = subRows || this.subRows;
@@ -101,9 +103,9 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 				subRow = subRows[si];
 				// for single-subrow cases in modern browsers, TR can be skipped
 				// http://jsperf.com/table-without-trs
-				tr = put(tbody, "tr");
+				tr = append(tbody, "tr");
 				if(subRow.className){
-					put(tr, "." + subRow.className);
+					setClass(append(tr), subRow.className);
 				}
 
 				for(i = 0, l = subRow.length; i < l; i++){
@@ -112,7 +114,7 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 					id = column.id;
 
 					extraClasses = column.field ?
-						".field-" + replaceInvalidChars(column.field) :
+						"field-" + replaceInvalidChars(column.field) :
 						"";
 					className = typeof column.className === "function" ?
 						column.className(object) : column.className;
@@ -120,15 +122,20 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 						extraClasses += "." + className;
 					}
 
-					cell = put(tag + (
-							".dgrid-cell.dgrid-cell-padding" +
-							(id ? ".dgrid-column-" + replaceInvalidChars(id) : "") +
-							extraClasses.replace(/ +/g, ".")
-						) + "[role=" + (tag === "th" ? "columnheader" : "gridcell") + "]");
+					cell = append.create(tag);
+					setClass(cell, "dgrid-cell", "dgrid-cell-padding");
+					if (id) {
+						setClass(cell, "dgrid-column-" + replaceInvalidChars(id));
+					}
+					var extra = extraClasses.split(" ");
+					extra.unshift(cell);
+					setClass.apply(null, extra);
+					cell.setAttribute("role", (tag === "th" ? "columnheader" : "gridcell"));
 					cell.columnId = id;
 					if(contentBoxSizing){
 						// The browser (IE7-) does not support box-sizing: border-box, so we emulate it with a padding div
-						innerCell = put(cell, "!dgrid-cell-padding div.dgrid-cell-padding");// remove the dgrid-cell-padding, and create a child with that class
+						setClass(cell, "!dgrid-cell-padding");// remove the dgrid-cell-padding,
+						innerCell = setClass(append(cell, "div"), ".dgrid-cell-padding");//and create a child with that class
 						cell.contents = innerCell;
 					}else{
 						innerCell = cell;
@@ -180,7 +187,11 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 			// row gets a wrapper div for a couple reasons:
 			//	1. So that one can set a fixed height on rows (heights can't be set on <table>'s AFAICT)
 			// 2. So that outline style can be set on a row when it is focused, and Safari's outline style is broken on <table>
-			return put("div[role=row]>", row);
+			var wrapper = append.create("div");
+			wrapper.setAttribute("role", "row");
+			append(wrapper, row);
+			return wrapper;
+			//return put("div[role=row]>", row);
 		},
 		renderHeader: function(){
 			// summary:
@@ -195,7 +206,7 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 			
 			// clear out existing header in case we're resetting
 			while(i--){
-				put(headerNode.childNodes[i], "!");
+				append.remove(headerNode.childNodes[i]);
 			}
 			
 			var row = this.createRowCells("th", function(th, column){
@@ -345,9 +356,9 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 			// Clean up UI from any previous sort
 			if(this._lastSortedArrow){
 				// Remove the sort classes from the parent node
-				put(this._lastSortedArrow, "<!dgrid-sort-up!dgrid-sort-down");
+				setClass(this._lastSortedArrow.parentNode, "!dgrid-sort-up", "!dgrid-sort-down");
 				// Destroy the lastSortedArrow node
-				put(this._lastSortedArrow, "!");
+				append.remove(this._lastSortedArrow);
 				delete this._lastSortedArrow;
 			}
 			
@@ -366,10 +377,11 @@ function(kernel, declare, listen, has, put, List, miscUtil){
 			if(target){
 				target = target.contents || target;
 				// Place sort arrow under clicked node, and add up/down sort class
-				arrowNode = this._lastSortedArrow = put("div.dgrid-sort-arrow.ui-icon[role=presentation]");
+				arrowNode = this._lastSortedArrow = setClass(append.create("div"), "dgrid-sort-arrow", "ui-icon");
+				arrowNode.setAttribute("role", "presentation");
 				arrowNode.innerHTML = "&nbsp;";
 				target.insertBefore(arrowNode, target.firstChild);
-				put(target, desc ? ".dgrid-sort-down" : ".dgrid-sort-up");
+				setClass(target, desc ? "dgrid-sort-down" : "dgrid-sort-up");
 				// Call resize in case relocation of sort arrow caused any height changes
 				this.resize();
 			}

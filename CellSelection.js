@@ -1,11 +1,11 @@
 define([
+	'ninejs/ui/utils/setClass',
 	"dojo/_base/declare",
 	"dojo/aspect",
-	"dojo/on",
+	"ninejs/core/on",
 	"dojo/has",
-	"./Selection",
-	"put-selector/put"
-], function(declare, aspect, listen, has, Selection, put){
+	"./Selection"
+], function(setClass, declare, aspect, listen, has, Selection){
 
 return declare(Selection, {
 	// summary:
@@ -74,10 +74,12 @@ return declare(Selection, {
 			if(element){
 				// add or remove classes as appropriate
 				if(value){
-					put(element, ".dgrid-selected" +
-						(this.addUiClasses ? ".ui-state-active" : ""));
+					setClass(element, "dgrid-selected");
+					if (this.addUiClasses) {
+						setClass(element, "ui-state-active");
+					}
 				}else{
-					put(element, "!dgrid-selected!ui-state-active");
+					setClass(element, "!dgrid-selected", "!ui-state-active");
 				}
 			}
 			if(value != previous && element){

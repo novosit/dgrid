@@ -1,11 +1,15 @@
-define(["../_StoreMixin", "dojo/_base/declare", "dojo/_base/array", "dojo/_base/lang", "dojo/_base/Deferred",
-	"dojo/on", "dojo/query", "dojo/string", "dojo/has", "put-selector/put", "dojo/i18n!./nls/pagination",
+define(['ninejs/ui/utils/setText',
+		'ninejs/ui/utils/setClass',
+		'ninejs/ui/utils/append',
+		'ninejs/core/extend',
+		"../_StoreMixin", "dojo/_base/declare", "ninejs/core/array", "dojo/_base/lang", "dojo/_base/Deferred",
+	"ninejs/core/on", "dojo/query", "dojo/string", "dojo/has", "dojo/i18n!./nls/pagination",
 	"dojo/_base/sniff", "xstyle/css!../css/extensions/Pagination.css"],
-function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has, put, i18n){
+function(setText, setClass, append, extend, _StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has, i18n){
 	function cleanupContent(grid){
 		// Remove any currently-rendered rows, or noDataMessage
 		if(grid.noDataNode){
-			put(grid.noDataNode, "!");
+			append.remove(grid.noDataNode);
 			delete grid.noDataNode;
 		}else{
 			grid.cleanup();
@@ -14,7 +18,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 	}
 	function cleanupLoading(grid){
 		if(grid.loadingNode){
-			put(grid.loadingNode, "!");
+			append.remove(grid.loadingNode);
 			delete grid.loadingNode;
 		}else if(grid._oldPageNodes){
 			// If cleaning up after a load w/ showLoadingMessage: false,
@@ -81,9 +85,9 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 			// add pagination to footer
 			var grid = this,
 				paginationNode = this.paginationNode =
-					put(this.footerNode, "div.dgrid-pagination"),
+					setClass(append(this.footerNode, "div"), "dgrid-pagination"),
 				statusNode = this.paginationStatusNode =
-					put(paginationNode, "div.dgrid-status"),
+					setClass(append(paginationNode, "div"), "dgrid-status"),
 				i18n = this.i18nPagination,
 				navigationNode,
 				node,
@@ -101,35 +105,35 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 				{ start: 1, end: 1, total: 0 });
 			
 			navigationNode = this.paginationNavigationNode =
-				put(paginationNode, "div.dgrid-navigation");
+				setClass(append(paginationNode, "div"), "dgrid-navigation");
 			
 			if(this.firstLastArrows){
 				// create a first-page link
 				node = this.paginationFirstNode =
-					put(navigationNode,  "span.dgrid-first.dgrid-page-link", "«");
+					setText(setClass(append(navigationNode,  "span"), "dgrid-first", "dgrid-page-link"), "«");
 				node.setAttribute("aria-label", i18n.gotoFirst);
 				node.tabIndex = 0;
 			}
 			if(this.previousNextArrows){
 				// create a previous link
 				node = this.paginationPreviousNode =
-					put(navigationNode,  "span.dgrid-previous.dgrid-page-link", "‹");
+					setText(setClass(append(navigationNode, "span"), "dgrid-previous", "dgrid-page-link"), "‹");
 				node.setAttribute("aria-label", i18n.gotoPrev);
 				node.tabIndex = 0;
 			}
 			
-			this.paginationLinksNode = put(navigationNode, "span.dgrid-pagination-links");
+			this.paginationLinksNode = setClass(append(navigationNode, "span"), "dgrid-pagination-links");
 			if(this.previousNextArrows){
 				// create a next link
 				node = this.paginationNextNode =
-					put(navigationNode, "span.dgrid-next.dgrid-page-link", "›");
+					setText(setClass(append(navigationNode, "span"), "dgrid-next", "dgrid-page-link"), "›");
 				node.setAttribute("aria-label", i18n.gotoNext);
 				node.tabIndex = 0;
 			}
 			if(this.firstLastArrows){
 				// create a last-page link
 				node = this.paginationLastNode =
-					put(navigationNode,  "span.dgrid-last.dgrid-page-link", "»");
+					setText(setClass(append(navigationNode, "span"), "dgrid-last", "dgrid-page-link"), "»");
 				node.setAttribute("aria-label", i18n.gotoLast);
 				node.tabIndex = 0;
 			}
@@ -186,7 +190,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 				if(!paginationSizeSelect){
 					// First time setting page options; create the select
 					paginationSizeSelect = this.paginationSizeSelect =
-						put(this.paginationNode, "select.dgrid-page-size");
+						setClass(append(this.paginationNode, "select"), "dgrid-page-size");
 					
 					handle = this._paginationSizeChangeHandle =
 						on(paginationSizeSelect, "change", lang.hitch(this, function(){
@@ -198,7 +202,9 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 				// Repopulate options
 				paginationSizeSelect.options.length = 0;
 				for(i = 0; i < pageSizeOptions.length; i++){
-					put(paginationSizeSelect, "option", pageSizeOptions[i], {
+					var opt = append(paginationSizeSelect, "option");
+					setText(opt, pageSizeOptions[i] || '');
+					extend.mixin(opt, {
 						value: pageSizeOptions[i],
 						selected: this.rowsPerPage === pageSizeOptions[i]
 					});
@@ -207,7 +213,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 				this._updateRowsPerPageOption();
 			}else if(!(pageSizeOptions && pageSizeOptions.length) && paginationSizeSelect){
 				// pageSizeOptions was removed; remove/unhook the drop-down
-				put(paginationSizeSelect, "!");
+				append.remove(paginationSizeSelect);
 				this.paginationSizeSelect = null;
 				this._paginationSizeChangeHandle.remove();
 			}
@@ -262,7 +268,9 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 				var link;
 				if(grid.pagingTextBox && page == currentPage && end > 1){
 					// use a paging text box if enabled instead of just a number
-					link = put(linksNode, 'input.dgrid-page-input[type=text][value=$]', currentPage);
+					link = setClass(append(linksNode, 'input'), 'dgrid-page-input');
+					link.type = "text";
+					link.value = currentPage;
 					link.setAttribute("aria-label", i18n.jumpPage);
 					grid._pagingTextBoxHandle = on(link, "change", function(){
 						var value = +this.value;
@@ -272,9 +280,11 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 					});
 				}else{
 					// normal link
-					link = put(linksNode,
-						'span' + (page == currentPage ? '.dgrid-page-disabled' : '') + '.dgrid-page-link',
-						page + (addSpace ? " " : ""));
+					link = append(linksNode, 'span');
+					if (page == currentPage) {
+						setClass(link, 'dgrid-page-disabled');
+					}
+					setText(setClass(link, 'dgrid-page-link'), (page + (addSpace ? " " : "")));
 					link.setAttribute("aria-label", i18n.gotoPage);
 					link.tabIndex = 0;
 				}
@@ -287,10 +297,10 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 			if(pagingTextBoxHandle){ pagingTextBoxHandle.remove(); }
 			linksNode.innerHTML = "";
 			query(".dgrid-first, .dgrid-previous", paginationNavigationNode).forEach(function(link){
-				put(link, (currentPage == 1 ? "." : "!") + "dgrid-page-disabled");
+				setClass(link, (currentPage == 1 ? "" : "!") + "dgrid-page-disabled");
 			});
 			query(".dgrid-last, .dgrid-next", paginationNavigationNode).forEach(function(link){
-				put(link, (currentPage >= end ? "." : "!") + "dgrid-page-disabled");
+				setClass(link, (currentPage >= end ? "" : "!") + "dgrid-page-disabled");
 			});
 			
 			if(pagingLinks && end > 0){
@@ -299,7 +309,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 				var start = currentPage - pagingLinks;
 				if(start > 2) {
 					// visual indication of skipped page links
-					put(linksNode, "span.dgrid-page-skip", "...");
+					setText(setClass(append(linksNode, "span"), "dgrid-page-skip"), "...");
 				}else{
 					start = 2;
 				}
@@ -308,7 +318,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 					pageLink(i, true);
 				}
 				if(currentPage + pagingLinks + 1 < end){
-					put(linksNode, "span.dgrid-page-skip", "...");
+					setText(setClass(append(linksNode, "span"), "dgrid-page-skip"), "...");
 				}
 				// last link
 				if(end > 1){
@@ -420,7 +430,7 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 				
 				if(grid.showLoadingMessage){
 					cleanupContent(grid);
-					loadingNode = grid.loadingNode = put(contentNode, "div.dgrid-loading");
+					loadingNode = grid.loadingNode = setClass(append(contentNode, "div"), "dgrid-loading");
 					loadingNode.innerHTML = grid.loadingMessage;
 				}else{
 					// Reference nodes to be cleared later, rather than now;
@@ -448,11 +458,11 @@ function(_StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has
 					Deferred.when(results.total, function(total){
 						if(!total){
 							if(grid.noDataNode){
-								put(grid.noDataNode, "!");
+								append.remove(grid.noDataNode);
 								delete grid.noDataNode;
 							}
 							// If there are no results, display the no data message.
-							grid.noDataNode = put(grid.contentNode, "div.dgrid-no-data");
+							grid.noDataNode = setClass(append(grid.contentNode, "div"), "dgrid-no-data");
 							grid.noDataNode.innerHTML = grid.noDataMessage;
 						}
 						

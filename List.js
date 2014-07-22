@@ -1,5 +1,9 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/dom", "dojo/on", "dojo/has", "./util/misc", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "put-selector/put", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"],
-function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put){
+define(['ninejs/core/array',
+		'ninejs/ui/utils/setText',
+		'ninejs/ui/utils/setClass',
+		'ninejs/ui/utils/append',
+		"dojo/_base/kernel", "dojo/_base/declare", "dojo/dom", "ninejs/core/on", "dojo/has", "./util/misc", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"],
+function(array, setText, setclass, append, kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass){
 	// Add user agent/feature CSS classes 
 	hasClass("mozilla", "opera", "webkit", "ie", "ie-6", "ie-6-7", "quirks", "no-quirks", "touch");
 	
@@ -18,7 +22,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 	
 	function getScrollbarSize(element, dimension){
 		// Used by has tests for scrollbar width/height
-		put(document.body, element, ".dgrid-scrollbar-measure");
+		setclass(append(document.body, element), "dgrid-scrollbar-measure");
 		var size = element["offset" + dimension] - element["client" + dimension];
 		cleanupTestElement(element);
 		return size;
@@ -31,18 +35,19 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 	});
 	
 	has.add("dom-rtl-scrollbar-left", function(global, doc, element){
-		var div = put("div"),
+		var div = append.create("div"),
 			isLeft;
 		
-		put(document.body, element, ".dgrid-scrollbar-measure[dir=rtl]");
-		put(element, div);
+		var t = setclass(append(document.body, element), "dgrid-scrollbar-measure");
+		t.dir = "rtl";
+		append(element, div);
 		
 		// position: absolute makes IE always report child's offsetLeft as 0,
 		// but it conveniently makes other browsers reset to 0 as base, and all
 		// versions of IE are known to move the scrollbar to the left side for rtl
 		isLeft = !!has("ie") || !!has("trident") || div.offsetLeft >= has("dom-scrollbar-width");
 		cleanupTestElement(element);
-		put(div, "!");
+		append.remove(div);
 		element.removeAttribute("dir");
 		return isLeft;
 	});
@@ -57,6 +62,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 	// (these are run in instance context)
 	var spaceRx = / +/g;
 	function setClass(cls){
+		var self = this;
 		// Format input appropriately for use with put...
 		var putClass = cls ? "." + cls.replace(spaceRx, ".") : "";
 		
@@ -64,7 +70,13 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 		if(this._class){
 			putClass = "!" + this._class.replace(spaceRx, "!") + putClass;
 		}
-		put(this.domNode, putClass);
+		if (putClass) {
+			array.forEach(putClass.split('.'), function (item) {
+				if (item) {
+					setclass(self.domNode, item);
+				}
+			});
+		}
 		
 		// Store for later retrieval/removal.
 		this._class = cls;
@@ -180,7 +192,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 		listType: "list",
 		
 		create: function(params, srcNodeRef){
-			var domNode = this.domNode = srcNodeRef || put("div"),
+			var domNode = this.domNode = srcNodeRef || append.create("div"),
 				cls;
 			
 			if(params){
@@ -241,19 +253,26 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 			// Clear out className (any pre-applied classes will be re-applied via the
 			// class / className setter), then apply standard classes/attributes
 			domNode.className = "";
-			
-			put(domNode, "[role=grid].dgrid.dgrid-" + this.listType +
-				(addUiClasses ? ".ui-widget" : ""));
+
+			setclass(domNode, "dgrid", "dgrid-" + this.listType);
+			if (addUiClasses) {
+				setclass(domNode, "ui-widget");
+			}
+			domNode.setAttribute("role", "grid");
 			
 			// Place header node (initially hidden if showHeader is false).
-			headerNode = this.headerNode = put(domNode, 
-				"div.dgrid-header.dgrid-header-row" +
-				(addUiClasses ? ".ui-widget-header" : "") +
-				(this.showHeader ? "" : ".dgrid-header-hidden"));
-			if(has("quirks") || has("ie") < 8){
-				spacerNode = put(domNode, "div.dgrid-spacer");
+			headerNode = this.headerNode = setclass(append(domNode,
+				"div"), "dgrid-header", "dgrid-header-row");
+			if (addUiClasses) {
+				setclass(this.headerNode, "ui-widget-header");
 			}
-			bodyNode = this.bodyNode = put(domNode, "div.dgrid-scroller");
+			if (!this.showHeader) {
+				setclass(this.headerNode, "dgrid-header-hidden");
+			}
+			if(has("quirks") || has("ie") < 8){
+				spacerNode = setclass(append(domNode, "div"), "dgrid-spacer");
+			}
+			bodyNode = this.bodyNode = setclass(append(domNode, "div"), "dgrid-scroller");
 			
 			// Firefox 4+ adds overflow: auto elements to the tab index by default;
 			// force them to not be tabbable, but restrict this to Firefox,
@@ -262,13 +281,17 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 				bodyNode.tabIndex = -1;
 			}
 			
-			this.headerScrollNode = put(domNode, "div.dgrid-header.dgrid-header-scroll.dgrid-scrollbar-width" +
-				(addUiClasses ? ".ui-widget-header" : ""));
+			this.headerScrollNode = setclass(append(domNode, "div"), "dgrid-header", "dgrid-header-scroll", "dgrid-scrollbar-width");
+			if (addUiClasses) {
+				setclass(this.headerScrollNode, "ui-widget-header");
+			}
 			
 			// Place footer node (initially hidden if showFooter is false).
-			footerNode = this.footerNode = put("div.dgrid-footer" +
-				(this.showFooter ? "" : ".dgrid-footer-hidden"));
-			put(domNode, footerNode);
+			footerNode = this.footerNode = setclass(append.create("div"), "dgrid-footer");
+			if (!this.showFooter) {
+				setclass(this.footerNode, "dgrid-footer-hidden");
+			}
+			append(domNode, footerNode);
 			
 			if(isRTL){
 				domNode.className += " dgrid-rtl" +
@@ -287,8 +310,11 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 			this.configStructure();
 			this.renderHeader();
 			
-			this.contentNode = this.touchNode = put(this.bodyNode,
-				"div.dgrid-content" + (addUiClasses ? ".ui-widget-content" : ""));
+			this.contentNode = this.touchNode = setclass(append(this.bodyNode,
+				"div"), "dgrid-content");
+			if (addUiClasses) {
+				setclass(this.contentNode, "ui-widget-content");
+			}
 			// add window resize handler, with reference for later removal if needed
 			this._listeners.push(this._resizeHandle = listen(window, "resize",
 				miscUtil.throttleDelayed(winResizeHandler, this)));
@@ -437,7 +463,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 			this._started = false;
 			this.cleanup();
 			// destroy DOM
-			put(this.domNode, "!");
+			append.remove(this.domNode);
 			
 			if(this.useTouchScroll){
 				// Only call TouchScroll#destroy if we also initialized it
@@ -460,10 +486,12 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 		newRow: function(object, parentNode, beforeNode, i, options){
 			if(parentNode){
 				var row = this.insertRow(object, parentNode, beforeNode, i, options);
-				put(row, ".dgrid-highlight" +
-					(this.addUiClasses ? ".ui-state-highlight" : ""));
+				setclass(row, "dgrid-highlight");
+				if (this.addUiClasses) {
+					setclass(row, "ui-state-highlight");
+				}
 				setTimeout(function(){
-					put(row, "!dgrid-highlight!ui-state-highlight");
+					setclass(row, "!dgrid-highlight", "!ui-state-highlight");
 				}, this.highlightDuration);
 				return row;
 			}
@@ -478,7 +506,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 					if(next.rowIndex > -1){
 						if(this.maintainOddEven){
 							if((next.className + ' ').indexOf("dgrid-row ") > -1){
-								put(next, '.' + (rowIndex % 2 == 1 ? oddClass : evenClass) + '!' + (rowIndex % 2 == 0 ? oddClass : evenClass));
+								setclass(next, '' + (rowIndex % 2 == 1 ? oddClass : evenClass),  '!' + (rowIndex % 2 == 0 ? oddClass : evenClass));
 							}
 						}
 						next.rowIndex = rowIndex++;
@@ -762,7 +790,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 			// summary:
 			//		Responsible for returning the DOM for a single row in the grid.
 			
-			return put("div", "" + value);
+			return setText(append.create("div"), "" + value);
 		},
 		removeRow: function(rowElement, justCleanup){
 			// summary:
@@ -778,7 +806,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 			rowElement = rowElement.element || rowElement;
 			delete this._rowIdToObject[rowElement.id];
 			if(!justCleanup){
-				put(rowElement, "!");
+				append.remove(rowElement);
 			}
 		},
 		
@@ -1034,7 +1062,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 			this.showHeader = show;
 			
 			// add/remove class which has styles for "hiding" header
-			put(headerNode, (show ? "!" : ".") + "dgrid-header-hidden");
+			setclass(headerNode, (show ? "!" : "") + "dgrid-header-hidden");
 			
 			this.renderHeader();
 			this.resize(); // resize to account for (dis)appearance of header
@@ -1053,7 +1081,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 			this.showFooter = show;
 			
 			// add/remove class which has styles for hiding footer
-			put(this.footerNode, (show ? "!" : ".") + "dgrid-footer-hidden");
+			setclass(this.footerNode, (show ? "!" : "") + "dgrid-footer-hidden");
 			
 			this.resize(); // to account for (dis)appearance of footer
 		}

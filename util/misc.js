@@ -1,7 +1,7 @@
 define([
-	"dojo/has",
-	"put-selector/put"
-], function(has, put){
+	'ninejs/ui/utils/append',
+	"dojo/has"
+], function(append, has){
 	// summary:
 	//		This module defines miscellaneous utility methods for purposes of
 	//		adding styles, and throttling/debouncing function calls.
@@ -138,7 +138,7 @@ define([
 			
 			if(!extraSheet){
 				// First time, create an extra stylesheet for adding rules
-				extraSheet = put(document.getElementsByTagName("head")[0], "style");
+				extraSheet = append(document.getElementsByTagName("head")[0], "style");
 				// Keep reference to actual StyleSheet object (`styleSheet` for IE < 9)
 				extraSheet = extraSheet.sheet || extraSheet.styleSheet;
 				// Store name of method used to remove rules (`removeRule` for IE < 9)

@@ -1,14 +1,14 @@
 define([
+	'ninejs/ui/utils/setClass',
 	"dojo/_base/declare",
 	"dojo/aspect",
-	"dojo/on",
+	"ninejs/core/on",
 	"dojo/_base/lang",
 	"dojo/has",
-	"put-selector/put",
 	"./util/misc",
 	"dojo/_base/Deferred",
 	"dojo/_base/sniff"
-], function(declare, aspect, on, lang, has, put, miscUtil, Deferred){
+], function(setClass, declare, aspect, on, lang, has, miscUtil, Deferred){
 
 var delegatingInputTypes = {
 		checkbox: 1,
@@ -235,7 +235,7 @@ var Keyboard = declare(null, {
 			}else{
 				// Row/cell was not focused or is not visible, but we still need to update tabIndex
 				// and the element's class to be consistent with the old one
-				put(newTarget.element, ".dgrid-focus");
+				setClass(newTarget.element, "dgrid-focus");
 				newTarget.element.tabIndex = this.tabIndex;
 			}
 		}
@@ -307,7 +307,8 @@ var Keyboard = declare(null, {
 		if(focusedNode){
 			// Clean up previously-focused element
 			// Remove the class name and the tabIndex attribute
-			put(focusedNode, "!dgrid-focus[!tabIndex]");
+			setClass(focusedNode, "!dgrid-focus");
+			focusedNode.removeAttribute("tabIndex");
 			if(has("ie") < 8){
 				// Clean up after workaround below (for non-input cases)
 				focusedNode.style.position = "";
@@ -339,7 +340,7 @@ var Keyboard = declare(null, {
 			element.tabIndex = this.tabIndex;
 			element.focus();
 		}
-		put(element, ".dgrid-focus");
+		setClass(element, "dgrid-focus");
 		
 		if(event){
 			on.emit(focusedNode, "dgrid-cellfocusin", event);

@@ -1,5 +1,7 @@
-define(["dojo/_base/declare", "dojo/on", "dojo/query", "dojo/_base/lang", "dojo/dom", "dojo/dom-geometry", "dojo/has", "../util/misc", "put-selector/put", "dojo/_base/html", "xstyle/css!../css/extensions/ColumnResizer.css"],
-function(declare, listen, query, lang, dom, geom, has, miscUtil, put){
+define(['ninejs/ui/utils/setClass',
+		'ninejs/ui/utils/append',
+		"dojo/_base/declare", "ninejs/core/on", "dojo/query", "dojo/_base/lang", "dojo/dom", "dojo/dom-geometry", "dojo/has", "../util/misc", "dojo/_base/html", "xstyle/css!../css/extensions/ColumnResizer.css"],
+function(setClass, append, declare, listen, query, lang, dom, geom, has, miscUtil){
 
 function addRowSpan(table, span, startRow, column, id){
 	// loop through the rows of the table and add this column's id to
@@ -128,17 +130,17 @@ var resizerNode, // DOM node for resize indicator, reused between instances
 var resizer = {
 	// This object contains functions for manipulating the shared resizerNode
 	create: function(){
-		resizerNode = put("div.dgrid-column-resizer");
+		resizerNode = setClass(append.create("div"), "dgrid-column-resizer");
 	},
 	destroy: function(){
-		put(resizerNode, "!");
+		append.remove(resizerNode);
 		resizerNode = null;
 	},
 	show: function(grid){
 		var pos = geom.position(grid.domNode, true);
 		resizerNode.style.top = pos.y + "px";
 		resizerNode.style.height = pos.h + "px";
-		put(document.body, resizerNode);
+		append(document.body, resizerNode);
 	},
 	move: function(x){
 		resizerNode.style.left = x + "px";
@@ -261,15 +263,17 @@ return declare(null, {
 
 			if(!col || col.resizable === false){ continue; }
 
-			var headerTextNode = put("div.dgrid-resize-header-container");
+			var headerTextNode = setClass(append.create("div"), "dgrid-resize-header-container");
 			colNode.contents = headerTextNode;
 
 			// move all the children to the header text node
 			while(childNodes.length > 0){
-				put(headerTextNode, childNodes[0]);
+				append.remove(childNodes[0]);
+				append(headerTextNode, childNodes[0]);
 			}
 
-			resizeHandle = put(colNode, headerTextNode, "div.dgrid-resize-handle.resizeNode-" +
+			append(colNode, headerTextNode);
+			resizeHandle = setClass(append(headerTextNode, "div"), "dgrid-resize-handle.resizeNode-" +
 				miscUtil.escapeCssIdentifier(id, "-"));
 			resizeHandle.columnId = assoc && assoc[id] || id;
 		}
