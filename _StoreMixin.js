@@ -340,7 +340,7 @@ function(setClass, append, kernel, declare, lang, Deferred, listen, aspect){
 			// no longer being present as a sibling.
 			var row = this.inherited(arguments);
 			if(this.noDataNode){
-				this.noDataNode.parentNode.removeChild(this.noDataNode);
+				append.remove(this.noDataNode);
 				delete this.noDataNode;
 			}
 			return row;
