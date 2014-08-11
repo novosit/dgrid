@@ -575,6 +575,8 @@ return function(column, editor, editOn){
 			showEditor(cmp, column, cell, value);
 			// Maintain reference for later use.
 			cell[isWidget ? "widget" : "input"] = cmp;
+		}else if(typeof (column.disabledEditorRenderer) === 'function') {
+			return column.disabledEditorRenderer(column, object, value, cell, options);
 		}else{
 			return originalRenderCell.call(column, object, value, cell, options);
 		}
