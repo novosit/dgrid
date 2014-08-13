@@ -1,6 +1,7 @@
-define(['ninejs/ui/utils/setClass',
+define(['ninejs/ui/utils/append',
+		'ninejs/ui/utils/setClass',
 		"dojo/_base/kernel", "ninejs/core/array", "dojo/aspect", "dojo/_base/sniff", "ninejs/core/on"],
-function(setClass, kernel, arrayUtil, aspect, has){
+function(append, setClass, kernel, arrayUtil, aspect, has){
 	return function(column, type){
 		
 		var listeners = [],
@@ -143,7 +144,16 @@ function(setClass, kernel, arrayUtil, aspect, has){
 			listeners.push(grid.on("dgrid-select", changeInput(true)));
 			listeners.push(grid.on("dgrid-deselect", changeInput(false)));
 		}
-		
+		function createInput(type, atts) {
+			var input = append.create('input');
+			input.type = type;
+			for (var p in atts) {
+				if (atts.hasOwnProperty(p)) {
+					input[p] = atts[p];
+				}
+			}
+			return input;
+		}
 		var renderInput = typeof type == "function" ? type : function(value, cell, object){
 			var parent = cell.parentNode,
 				disabled;
@@ -156,13 +166,13 @@ function(setClass, kernel, arrayUtil, aspect, has){
 			disabled = column.disabled;
 
 			// must set the class name on the outer cell in IE for keystrokes to be intercepted
-			put(parent && parent.contents ? parent : cell, ".dgrid-selector");
-			var input = cell.input || (cell.input = put(cell, "input[type="+type + "]", {
+			setClass(parent && parent.contents ? parent : cell, "dgrid-selector");
+			var input = cell.input || (cell.input = append(cell, createInput(type, {
 				tabIndex: isNaN(column.tabIndex) ? -1 : column.tabIndex,
 				disabled: disabled && (typeof disabled == "function" ?
 					disabled.call(column, object) : disabled),
 				checked: value
-			}));
+			})));
 			input.setAttribute("aria-checked", !!value);
 			
 			return input;

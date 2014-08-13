@@ -214,7 +214,7 @@ function tree(column){
 				if(!preloadNode){
 					// if the children have not been created, create a container, a preload node and do the 
 					// query for the children
-					container = rowElement.connected = setClass(append('div'), 'dgrid-tree-container');//put(rowElement, '+...
+					container = rowElement.connected = setClass(append.create('div'), 'dgrid-tree-container');//put(rowElement, '+...
 					//setting container after rowElement
 					if (rowElement.nextSibling) {
 						rowElement.parentNode.insertBefore(container, rowElement.nextSibling);
