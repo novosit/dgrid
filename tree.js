@@ -220,7 +220,7 @@ function tree(column){
 						rowElement.parentNode.insertBefore(container, rowElement.nextSibling);
 					}
 					else {
-						append(rowElement.parentNode, container);
+						append(rowElement, container);
 					}
 					preloadNode = target.preloadNode = setClass(append(container, 'div'), 'dgrid-preload');
 					var query = function(options){
