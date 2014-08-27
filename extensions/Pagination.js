@@ -163,7 +163,7 @@ function(setText, setClass, append, extend, _StoreMixin, declare, arrayUtil, lan
 					grid.gotoPage(1);
 				}else if(this === grid.paginationLastNode){
 					grid.gotoPage(max);
-				}else if(cls === "dgrid-page-link"){
+				}else if(setClass.has(this, 'dgrid-page-link')){
 					grid.gotoPage(+this.innerHTML, true); // the innerHTML has the page number
 				}
 			}));
