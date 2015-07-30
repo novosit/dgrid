@@ -40,8 +40,8 @@ var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey",
 	hasUserSelect = has("css-user-select"),
 	hasPointer = has("pointer"),
 	hasMSPointer = hasPointer && hasPointer.slice(0, 2) === "MS",
-	downType = hasPointer ? hasPointer + (hasMSPointer ? "Down" : "down") : "mousedown",
-	upType = hasPointer ? hasPointer + (hasMSPointer ? "Up" : "up") : "mouseup";
+	downType = hasPointer ? hasPointer + (hasMSPointer ? "Down" : "down") + ",mousedown" : "mousedown",
+	upType = hasPointer ? hasPointer + (hasMSPointer ? "Up" : "up") + ",mouseup" : "mouseup";
 
 function makeUnselectable(node, unselectable){
 	// Utility function used in fallback path for recursively setting unselectable
