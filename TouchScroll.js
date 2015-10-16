@@ -5,6 +5,9 @@ define(['ninejs/ui/utils/setClass',
 		'ninejs/ui/utils/append',
 		"dojo/_base/declare", "ninejs/core/on", "./util/touch", "./util/has-css3", "xstyle/css!./css/TouchScroll.css"],
 function(setClass, append, declare, on, touchUtil, has){
+	append = append.default;
+	setClass = setClass.default;
+	on = on.default;
 	var
 		calcTimerRes = 50, // ms between drag velocity measurements
 		glideTimerRes = 30, // ms between glide animation ticks

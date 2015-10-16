@@ -2,6 +2,7 @@ define([
 	'ninejs/ui/utils/append',
 	"dojo/has"
 ], function(append, has){
+	append = append.default;
 	// summary:
 	//		This module defines miscellaneous utility methods for purposes of
 	//		adding styles, and throttling/debouncing function calls.

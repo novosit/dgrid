@@ -11,6 +11,9 @@ define([
 	"./Grid",
 	"dojo/has!touch?./util/touch"
 ], function(setClass, append, declare, arrayUtil, Deferred, querySelector, on, aspect, has, Grid, touchUtil){
+	append = append.default;
+	setClass = setClass.default;
+	on = on.default;
 
 function defaultRenderExpando(level, hasChildren, expanded, object){
 	// summary:

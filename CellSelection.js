@@ -6,6 +6,8 @@ define([
 	"dojo/has",
 	"./Selection"
 ], function(setClass, declare, aspect, listen, has, Selection){
+	setClass = setClass.default;
+	on = on.default;
 
 return declare(Selection, {
 	// summary:

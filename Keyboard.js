@@ -9,6 +9,8 @@ define([
 	"dojo/_base/Deferred",
 	"dojo/_base/sniff"
 ], function(setClass, declare, aspect, on, lang, has, miscUtil, Deferred){
+	setClass = setClass.default;
+	on = on.default;
 
 var delegatingInputTypes = {
 		checkbox: 1,

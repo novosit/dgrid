@@ -6,6 +6,10 @@ define(['ninejs/ui/utils/setText',
 	"ninejs/core/on", "dojo/query", "dojo/string", "dojo/has", "dojo/i18n!./nls/pagination",
 	"dojo/_base/sniff", "xstyle/css!../css/extensions/Pagination.css"],
 function(setText, setClass, append, extend, _StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has, i18n){
+	setText = setText.default;
+	append = append.default;
+	setClass = setClass.default;
+	on = on.default;
 	function cleanupContent(grid){
 		// Remove any currently-rendered rows, or noDataMessage
 		if(grid.noDataNode){

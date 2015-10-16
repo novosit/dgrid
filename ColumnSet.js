@@ -2,6 +2,9 @@ define(['ninejs/ui/utils/setClass',
 		'ninejs/ui/utils/append',
 		"dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "ninejs/core/on", "dojo/aspect", "dojo/query", "dojo/has", "./util/misc", "xstyle/has-class", "./Grid", "dojo/_base/sniff", "xstyle/css!./css/columnset.css"],
 function(setClass, append, kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, hasClass, Grid){
+	append = append.default;
+	setClass = setClass.default;
+	listen = listen.default;
 	has.add("event-mousewheel", function(global, document, element){
 		return typeof element.onmousewheel !== "undefined";
 	});
@@ -18,9 +21,9 @@ function(setClass, append, kernel, declare, lang, Deferred, listen, aspect, quer
 	});
 
 	var colsetidAttr = "data-dgrid-column-set-id";
-	
+
 	hasClass("safari", "ie-7");
-	
+
 	function adjustScrollLeft(grid, row){
 		var scrollLefts = grid._columnSetScrollLefts;
 		function doAdjustScrollLeft(){
@@ -34,7 +37,7 @@ function(setClass, append, kernel, declare, lang, Deferred, listen, aspect, quer
 			doAdjustScrollLeft();
 		}
 	}
-	
+
 	function scrollColumnSet(grid, columnSetNode, amount){
 		var id = columnSetNode.getAttribute(colsetidAttr),
 			scroller = grid._columnSetScrollers[id],
@@ -82,7 +85,7 @@ function(setClass, append, kernel, declare, lang, Deferred, listen, aspect, quer
 						return;
 					}
 				}
-				
+
 				// Normalize reported delta value:
 				// wheelDeltaX (webkit, mousewheel) needs to be negated and divided by 3
 				// deltaX (FF17+, wheel) can be used exactly as-is
@@ -103,21 +106,21 @@ function(setClass, append, kernel, declare, lang, Deferred, listen, aspect, quer
 			});
 		};
 	};
-	
+
 	return declare(null, {
 		// summary:
-		//		Provides column sets to isolate horizontal scroll of sets of 
+		//		Provides column sets to isolate horizontal scroll of sets of
 		//		columns from each other. This mainly serves the purpose of allowing for
 		//		column locking.
-		
+
 		postCreate: function(){
 			this.inherited(arguments);
-			
+
 			this.on(horizMouseWheel(this), function(grid, colsetNode, amount){
 				var id = colsetNode.getAttribute(colsetidAttr),
 					scroller = grid._columnSetScrollers[id],
 					scrollLeft = scroller.scrollLeft + amount;
-				
+
 				scroller.scrollLeft = scrollLeft < 0 ? 0 : scrollLeft;
 			});
 		},
@@ -152,7 +155,7 @@ function(setClass, append, kernel, declare, lang, Deferred, listen, aspect, quer
 			// summary:
 			//		Setup the headers for the grid
 			this.inherited(arguments);
-			
+
 			var columnSets = this.columnSets,
 				domNode = this.domNode,
 				scrollers = this._columnSetScrollers,
@@ -160,11 +163,11 @@ function(setClass, append, kernel, declare, lang, Deferred, listen, aspect, quer
 				scrollLefts = this._columnSetScrollLefts = {},
 				grid = this,
 				i, l;
-			
+
 			function reposition(){
 				grid._positionScrollers();
 			}
-			
+
 			if (scrollers) {
 				// this isn't the first time; destroy existing scroller nodes first
 				for(i in scrollers){
@@ -176,27 +179,27 @@ function(setClass, append, kernel, declare, lang, Deferred, listen, aspect, quer
 				aspect.after(this, "styleColumn", reposition, true);
 				listen(domNode, ".dgrid-column-set:dgrid-cellfocusin", lang.hitch(this, '_onColumnSetScroll'));
 			}
-			
+
 			// reset to new object to be populated in loop below
 			scrollers = this._columnSetScrollers = {};
-			
+
 			for(i = 0, l = columnSets.length; i < l; i++){
 				this._putScroller(columnSets[i], i);
 			}
-			
+
 			this._positionScrollers();
 		},
-		
+
 		styleColumnSet: function(colsetId, css){
 			// summary:
 			//		Dynamically creates a stylesheet rule to alter a columnset's style.
-			
+
 			var rule = this.addCssRule("#" + miscUtil.escapeCssIdentifier(this.domNode.id) +
 				" .dgrid-column-set-" + miscUtil.escapeCssIdentifier(colsetId, "-"), css);
 			this._positionScrollers();
 			return rule;
 		},
-		
+
 		_destroyColumns: function(){
 			var columnSetsLength = this.columnSets.length,
 				i, j, k, subRowsLength, len, columnSet, subRow, column;
@@ -236,7 +239,7 @@ function(setClass, append, kernel, declare, lang, Deferred, listen, aspect, quer
 				scrollerWidth = 0,
 				numScrollers = 0, // tracks number of visible scrollers (sets w/ overflow)
 				i, l, columnSetElement, contentWidth;
-			
+
 			for(i = 0, l = columnSets.length; i < l; i++){
 				// iterate through the columnSets
 				left += scrollerWidth;
@@ -252,7 +255,7 @@ function(setClass, append, kernel, declare, lang, Deferred, listen, aspect, quer
 				// Keep track of how many scrollbars we're showing
 				if(contentWidth > scrollerWidth){ numScrollers++; }
 			}
-			
+
 			// Align bottom of body node depending on whether there are scrollbars
 			this.bodyNode.style.bottom = numScrollers ?
 				(has("dom-scrollbar-height") + (has("ie") ? 1 : 0) + "px") :
@@ -290,7 +293,7 @@ function(setClass, append, kernel, declare, lang, Deferred, listen, aspect, quer
 				this._columnSetScrollLefts[colSetId] = newScrollLeft;
 			}
 		},
-		
+
 		_setColumnSets: function(columnSets){
 			this._destroyColumns();
 			this.columnSets = columnSets;

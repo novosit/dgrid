@@ -8,6 +8,8 @@ define([
 	"dojo/dnd/Source",
 	"xstyle/css!../css/extensions/ColumnReorder.css"
 ], function(setClass, lang, declare, arrayUtil, on, query, DndSource){
+	setClass = setClass.default;
+	on = on.default;
 	var dndTypeRx = /(\d+)(?:-(\d+))?$/; // used to determine subrow from dndType
 	
 	// The following 2 functions are used by onDropInternal logic for

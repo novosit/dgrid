@@ -2,6 +2,8 @@ define(['ninejs/ui/utils/append',
 		'ninejs/ui/utils/setClass',
 		"dojo/_base/kernel", "ninejs/core/array", "dojo/aspect", "dojo/_base/sniff", "ninejs/core/on"],
 function(append, setClass, kernel, arrayUtil, aspect, has){
+	append = append.default;
+	setClass = setClass.default;
 	return function(column, type){
 		
 		var listeners = [],
