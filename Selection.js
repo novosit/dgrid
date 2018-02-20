@@ -1,5 +1,5 @@
 define(['ninejs/ui/utils/setClass',
-		"dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "ninejs/core/on", "dojo/has", "dojo/aspect", "./List", "dojo/has!touch?./util/touch", "dojo/query", "dojo/_base/sniff"],
+		"dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/Deferred", "ninejs/core/on", "dojo/has", "dojo/aspect", "./List", "./util/touch", "dojo/query", "dojo/_base/sniff"],
 function(setClass, kernel, declare, Deferred, on, has, aspect, List, touchUtil){
 
 has.add("dom-comparedocumentposition", function(global, doc, element){

@@ -12,10 +12,11 @@ define([
 	"dojo/dnd/Manager",
 	"dojo/_base/NodeList",
 	"../Selection",
-	"dojo/has!touch?../util/touch",
-	"dojo/has!touch?./_DnD-touch-autoscroll",
-	"xstyle/css!dojo/resources/dnd.css"
-], function(setClass, declare, lang, arrayUtil, Deferred, aspect, on, topic, has, DnDSource, DnDManager, NodeList, Selection, touchUtil){
+	"../util/touch",
+	"dojo/resources/dnd.ncss",
+	"./_DnD-touch-autoscroll"
+], function(setClass, declare, lang, arrayUtil, Deferred, aspect, on, topic, has, DnDSource, DnDManager, NodeList, Selection, touchUtil, css){
+	css.enable();
 	// Requirements
 	// * requires a store (sounds obvious, but not all Lists/Grids have stores...)
 	// * must support options.before in put calls

@@ -9,7 +9,7 @@ define([
 	"dojo/aspect",
 	"./util/has-css3",
 	"./Grid",
-	"dojo/has!touch?./util/touch"
+	"./util/touch"
 ], function(setClass, append, declare, arrayUtil, Deferred, querySelector, on, aspect, has, Grid, touchUtil){
 
 function defaultRenderExpando(level, hasChildren, expanded, object){
