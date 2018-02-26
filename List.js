@@ -2,9 +2,29 @@ define(['ninejs/core/array',
 		'ninejs/ui/utils/setText',
 		'ninejs/ui/utils/setClass',
 		'ninejs/ui/utils/append',
-		"dojo/_base/kernel", "dojo/_base/declare", "dojo/dom", "ninejs/core/on", "dojo/has", "./util/misc", "./TouchScroll", "xstyle/has-class", "./css/dgrid.ncss", "dojo/_base/sniff"],
-function(array, setText, setclass, append, kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, css){
+		"dojo/_base/kernel", "dojo/_base/declare", "dojo/dom", "ninejs/core/on", "dojo/has", "./util/misc", "./TouchScroll", "./css/dgrid.ncss", "dojo/_base/sniff"],
+function(array, setText, setclass, append, kernel, declare, dom, listen, has, miscUtil, TouchScroll, css){
 	css.enable();
+	
+	var hasClass = (function () {
+		var tested = {};
+		return function(){
+			var test, args = arguments;
+			for(var i = 0; i < args.length; i++){
+				var test = args[i];
+				if(!tested[test]){
+					tested[test] = true;
+					var parts = test.match(/^(no-)?(.+?)((-[\d\.]+)(-[\d\.]+)?)?$/), // parse the class name
+						hasResult = has(parts[2]), // the actual has test
+						lower = -parts[4]; // lower bound if it is in the form of test-4 or test-4-6 (would be 4)
+					if((lower > 0 ? lower <= hasResult && (-parts[5] || lower) >= hasResult :  // if it has a range boundary, compare to see if we are in it
+							!!hasResult) == !parts[1]){ // parts[1] is the no- prefix that can negate the result
+						document.documentElement.className += ' has-' + test;
+					}
+				}
+			}
+		};
+	})();
 	// Add user agent/feature CSS classes 
 	hasClass("mozilla", "opera", "webkit", "ie", "ie-6", "ie-6-7", "quirks", "no-quirks", "touch");
 	
