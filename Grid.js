@@ -105,7 +105,7 @@ function(setClass, append, kernel, declare, listen, has, List, miscUtil){
 				// http://jsperf.com/table-without-trs
 				tr = append(tbody, "tr");
 				if(subRow.className){
-					setClass(append(tr), subRow.className);
+					setClass(tr, subRow.className);
 				}
 
 				for(i = 0, l = subRow.length; i < l; i++){
