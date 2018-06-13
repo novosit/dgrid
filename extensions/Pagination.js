@@ -4,8 +4,9 @@ define(['ninejs/ui/utils/setText',
 		'ninejs/core/extend',
 		"../_StoreMixin", "dojo/_base/declare", "ninejs/core/array", "dojo/_base/lang", "dojo/_base/Deferred",
 	"ninejs/core/on", "dojo/query", "dojo/string", "dojo/has", "dojo/i18n!./nls/pagination",
-	"dojo/_base/sniff", "xstyle/css!../css/extensions/Pagination.css"],
-function(setText, setClass, append, extend, _StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has, i18n){
+	"dojo/_base/sniff", "ninejs/css!../css/extensions/Pagination.css"],
+function(setText, setClass, append, extend, _StoreMixin, declare, arrayUtil, lang, Deferred, on, query, string, has, i18n, sniff, css){
+  css.enable();
 	function cleanupContent(grid){
 		// Remove any currently-rendered rows, or noDataMessage
 		if(grid.noDataNode){
