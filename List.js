@@ -2,9 +2,8 @@ define(['ninejs/core/array',
 		'ninejs/ui/utils/setText',
 		'ninejs/ui/utils/setClass',
 		'ninejs/ui/utils/append',
-		"dojo/_base/kernel", "dojo/_base/declare", "dojo/dom", "ninejs/core/on", "dojo/has", "./util/misc", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "dojo/_base/sniff", "ninejs/css!./css/dgrid.css"],
-function(array, setText, setclass, append, kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, sniff, css){
-	css.enable();
+		"dojo/_base/kernel", "dojo/_base/declare", "dojo/dom", "ninejs/core/on", "dojo/has", "./util/misc", "dojo/has!touch?./TouchScroll", "xstyle/has-class", "dojo/_base/sniff", "xstyle/css!./css/dgrid.css"],
+function(array, setText, setclass, append, kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass){
 	// Add user agent/feature CSS classes 
 	hasClass("mozilla", "opera", "webkit", "ie", "ie-6", "ie-6-7", "quirks", "no-quirks", "touch");
 	
