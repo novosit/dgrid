@@ -1,8 +1,10 @@
 define(['ninejs/ui/utils/setText',
 		'ninejs/ui/utils/setClass',
 		'ninejs/ui/utils/append',
-		"dojo/_base/declare", "dojo/has", "ninejs/core/on", "../util/misc", "dojo/i18n!./nls/columnHider", "xstyle/css!../css/extensions/ColumnHider.css"],
-function(setText, setClass, append, declare, has, listen, miscUtil, i18n){
+		"dojo/_base/declare", "dojo/has", "ninejs/core/on", "../util/misc", "dojo/i18n!./nls/columnHider", "ninejs/css!../css/extensions/ColumnHider.css"],
+function(setText, setClass, append, declare, has, listen, miscUtil, i18n, css){
+	css.enable();
+
 /*
  *	Column Hider plugin for dgrid
  *	Originally contributed by TRT 2011-09-28

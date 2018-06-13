@@ -6,8 +6,10 @@ define([
 	"ninejs/core/on",
 	"dojo/query",
 	"dojo/dnd/Source",
-	"xstyle/css!../css/extensions/ColumnReorder.css"
-], function(setClass, lang, declare, arrayUtil, on, query, DndSource){
+	"ninejs/css!../css/extensions/ColumnReorder.css"
+], function(setClass, lang, declare, arrayUtil, on, query, DndSource, css){
+	css.enable();
+
 	var dndTypeRx = /(\d+)(?:-(\d+))?$/; // used to determine subrow from dndType
 	
 	// The following 2 functions are used by onDropInternal logic for

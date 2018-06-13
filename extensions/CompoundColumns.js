@@ -4,8 +4,10 @@ define([
 	"dojo/sniff",
 	"dojo/query",
 	"../util/misc",
-	"xstyle/css!../css/extensions/CompoundColumns.css"
-], function(lang, declare, has, query, miscUtil){
+	"ninejs/css!../css/extensions/CompoundColumns.css"
+], function(lang, declare, has, query, miscUtil, css){
+	css.enable();
+
 	return declare(null, {
 		// summary:
 		//		Extension allowing for specification of columns with additional

@@ -1,7 +1,9 @@
 define(['ninejs/ui/utils/setClass',
 		'ninejs/ui/utils/append',
-		"dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "ninejs/core/on", "dojo/aspect", "dojo/query", "dojo/has", "./util/misc", "xstyle/has-class", "./Grid", "dojo/_base/sniff", "xstyle/css!./css/columnset.css"],
-function(setClass, append, kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, hasClass, Grid){
+		"dojo/_base/kernel", "dojo/_base/declare", "dojo/_base/lang", "dojo/_base/Deferred", "ninejs/core/on", "dojo/aspect", "dojo/query", "dojo/has", "./util/misc", "xstyle/has-class", "./Grid", "dojo/_base/sniff", "ninejs/css!./css/columnset.css"],
+function(setClass, append, kernel, declare, lang, Deferred, listen, aspect, query, has, miscUtil, hasClass, Grid, sniff, css){
+	css.enable();
+
 	has.add("event-mousewheel", function(global, document, element){
 		return typeof element.onmousewheel !== "undefined";
 	});
