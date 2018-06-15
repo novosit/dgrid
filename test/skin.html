@@ -44,7 +44,7 @@
 					params = q ? ioq.queryToObject(q.substr(1)) : {},
 					// honor skin specification from query param
 					skin = params.skin || "claro",
-					xstylePrefix = "xstyle/css!dgrid/css/",
+					xstylePrefix = "ninejs/css!dgrid/css/",
 					xstyleBase = xstylePrefix + "dgrid.css",
 					xstyleRtl = xstylePrefix + "dgrid_rtl.css",
 					xstyleSkin = xstylePrefix + "skins/" + skin + ".css",
@@ -66,6 +66,9 @@
 				
 				require(deps, 
 				function(css1, css2, css3, List, Grid, tree, Selection, Keyboard, editor, declare, domConstruct, testStore){
+					css1.enable();
+					css2.enable();
+					css3.enable();
 					var grid,
 						columns = {
 							col1: "Column 1",

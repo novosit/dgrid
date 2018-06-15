@@ -51,10 +51,11 @@
 					"dojo/_base/declare", "dojo/on", "dojo/data/ObjectStore",
 					"dijit/form/CheckBox", "dijit/form/TimeTextBox",
 					"dijit/form/Select", "dijit/form/FilteringSelect",
-					"dgrid/extensions/Pagination", "dgrid/test/data/base", "dojo/domReady!", "xstyle/css!../css/dgrid_rtl.css"], 
+					"dgrid/extensions/Pagination", "dgrid/test/data/base", "dojo/domReady!", "ninejs/css!../css/dgrid_rtl.css"], 
 				function(Grid, OnDemandGrid, Selection, Keyboard, tree, editor, lang, declare,
 						 on, ObjectStore, CheckBox, TimeTextBox, Select,
-						 FilteringSelect, Pagination, testStore){
+						 FilteringSelect, Pagination, testStore, ready, css){
+					css.enable();
 					var columns = [
 						{label: 'Column 1', field: 'col1'},
 						{label: 'Column 2', field: 'col2', sortable: false},

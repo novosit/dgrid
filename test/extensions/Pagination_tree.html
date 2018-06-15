@@ -31,7 +31,7 @@
 				match = /\bskin=([^&]*)/.exec(location.search),
 				skinDep, updateGrid;
 			if(match){ skin = match[1]; }
-			skinDep = "xstyle/css!dgrid/css/skins/" + skin + ".css";
+			skinDep = "ninejs/css!dgrid/css/skins/" + skin + ".css";
 			
 			require([skinDep, "dgrid/Grid", "dgrid/extensions/Pagination", "dgrid/Selection", "dgrid/tree",
 					"dojo/_base/lang", "dojo/_base/declare", "dojo/dom-construct", "dojo/dom-form", 
